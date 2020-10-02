@@ -1,0 +1,78 @@
+;Q1
+	add r0, #4, r9		;int g = 4
+	
+min: ;Optimised
+	add r0, r26, r1		;int v=a
+	sub r27, r1, r0 {C}	;if(b<v)
+	jge comparetoC
+	xor r0, r0, r0		;nop
+	add r0, r27, r1		;v=b
+compareToC:
+	sub r28, r1, r0 {C}	;if(c<v)
+	jge returning
+	xor r0, r0, r0		;nop
+	add r0, r28, r1		;v=c
+	jmp returning
+returning:
+	return r25, 0
+	xor r0, r0, r0		;nop
+	
+
+p: ;optimised
+	add r0, r26, r10	;pass i to function
+	add r0, r27, r11	;pass j to function
+	
+	callr r25, min		;min(g,i,j)
+	add r0, r9, r12		;pass g to function (OPT)
+	add r0, r1, r10	    ;pass min(g,i,j)into next function
+	add r0, r12, r11	;pass k to next function
+
+	callr r25, min		(min(min(g,i,j),k,l)
+	add r0, r13, r12	;pass l to next function
+	return r25,0		;return
+	xor r0,r0,r0		;nop
+	
+	
+gcd: ;Optimised
+	
+	add r0, r27, r11	;pass b to next function
+	sub r11, r0, r0{C}	;if(b==0)
+	jne doMod
+	add r0, r26, r10	;pass a to next function
+	
+	return r25, 0
+	add r26,r0, r1		;return a
+doMod:
+	callr r25, mod
+	xor r0, r0, r0		;nop
+	add r0, r25, r10	;gcd(b, a%b)
+	callr r25, gcd		;nop
+	xor r0, r0, r0
+	ret r25, 0
+	xor r0, r0, r0		;nop
+	
+	
+;Q2
+;6 Register Sets
+;Number of procedure calls: 172233
+;Maximum register window depth: 511
+;Number of register window overflows: 84883
+;Number of register window underflows: 84885
+
+;8 Register Sets
+;Number of procedure calls: 172233
+;Maximum register window depth: 511
+;Number of register window overflows: 83909
+;Number of register window underflows: 83911
+
+;16 Register Sets
+;Number of procedure calls: 172233
+;Maximum register window depth: 511
+;Number of register window overflows: 80140
+;Number of register window underflows: 80142
+
+;Q3
+;14.342384 milliseconds	
+;I start the timer before running the ackermann function and end the timer
+;after it. I then subtract the start time from the end time to get the time
+taken by the function.
